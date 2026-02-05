@@ -75,6 +75,11 @@ public class UrunController : Controller
     [HttpPost]
     public async Task<ActionResult> Create(UrunCreateModel model)
     {
+        if (model.Resim == null || model.Resim.Length == 0)
+        {
+            ModelState.AddModelError("Resim", "Resim seçmelisiniz.");
+        }
+
         if (ModelState.IsValid)
         {
             var fileName = Path.GetRandomFileName() + ".jpg";
@@ -89,10 +94,10 @@ public class UrunController : Controller
             {
                 UrunAdi = model.UrunAdi,
                 Aciklama = model.Aciklama,
-                Fiyat = model.Fiyat,
+                Fiyat = model.Fiyat ?? 0,
                 Aktif = model.Aktif,
                 Anasayfa = model.Anasayfa,
-                KategoriId = model.KategoriId,
+                KategoriId = (int)model.KategoriId!,
                 Resim = fileName    // upload
             };
 
@@ -132,37 +137,42 @@ public class UrunController : Controller
             return RedirectToAction("Index");
         }
 
-        var entity = _context.Urunler.FirstOrDefault(i => i.Id == model.Id);
-
-        if (entity != null)
+        if (ModelState.IsValid)
         {
-            if (model.ResimDosyasi != null)
-            {
-                var fileName = Path.GetRandomFileName() + ".jpg";
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img", fileName);
 
-                using (var stream = new FileStream(path, FileMode.Create))
+            var entity = _context.Urunler.FirstOrDefault(i => i.Id == model.Id);
+
+            if (entity != null)
+            {
+                if (model.Resim != null)
                 {
-                    await model.ResimDosyasi!.CopyToAsync(stream);
+                    var fileName = Path.GetRandomFileName() + ".jpg";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/img", fileName);
+
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await model.Resim!.CopyToAsync(stream);
+                    }
+
+                    entity.Resim = fileName;
                 }
 
-                entity.Resim = fileName;
+                entity.UrunAdi = model.UrunAdi;
+                entity.Aciklama = model.Aciklama;
+                entity.Fiyat = model.Fiyat ?? 0;
+                entity.Aktif = model.Aktif;
+                entity.Anasayfa = model.Anasayfa;
+                entity.KategoriId = (int)model.KategoriId!;
+
+                _context.SaveChanges();
+
+                TempData["Mesaj"] = $"{entity.UrunAdi} ürünü güncellendi.";
+
+                return RedirectToAction("Index");
             }
-
-            entity.UrunAdi = model.UrunAdi;
-            entity.Aciklama = model.Aciklama;
-            entity.Fiyat = model.Fiyat;
-            entity.Aktif = model.Aktif;
-            entity.Anasayfa = model.Anasayfa;
-            entity.KategoriId = model.KategoriId;
-
-            _context.SaveChanges();
-
-            TempData["Mesaj"] = $"{entity.UrunAdi} ürünü güncellendi.";
-
-            return RedirectToAction("Index");
         }
 
+        ViewBag.Kategoriler = new SelectList(_context.Kategoriler.ToList(), "Id", "KategoriAdi");
         return View(model);
     }
 }

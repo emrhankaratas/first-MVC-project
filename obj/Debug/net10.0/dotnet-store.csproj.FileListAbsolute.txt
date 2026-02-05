@@ -211,3 +211,4 @@ C:\Users\user\Desktop\dotnet-store\obj\Debug\net10.0\dotnet-store.genruntimeconf
 C:\Users\user\Desktop\dotnet-store\obj\Debug\net10.0\ref\dotnet-store.dll
 C:\Users\user\Desktop\dotnet-store\obj\Debug\net10.0\compressed\49kswhn6un-{0}-h9v4xoiqc9-h9v4xoiqc9.gz
 C:\Users\user\Desktop\dotnet-store\obj\Debug\net10.0\compressed\lc716ummtx-{0}-iuupnodv0a-iuupnodv0a.gz
+C:\Users\user\Desktop\dotnet-store\obj\Debug\net10.0\dotnet-store.sourcelink.json
