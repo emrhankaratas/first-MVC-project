@@ -89,4 +89,41 @@ public class KategoriController : Controller
         return View(model);
     }
 
+    public ActionResult Delete(int? id)
+    {
+        if (id == null)
+        {
+            return RedirectToAction("Index");
+        }
+
+        var entity = _context.Kategoriler.FirstOrDefault(i => i.Id == id);
+
+        if (entity != null)
+        {
+           return View(entity);
+        }
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public ActionResult DeleteConfirm(int? id)
+    {
+        if (id == null)
+        {
+            return RedirectToAction("Index");
+        }
+
+        var entity = _context.Kategoriler.FirstOrDefault(i => i.Id == id);
+
+        if (entity != null)
+        {
+            _context.Kategoriler.Remove(entity);
+            _context.SaveChanges();
+
+            TempData["Mesaj"] = $"{entity.KategoriAdi} kategorisi silindi.";
+
+        }
+        return RedirectToAction("Index");
+    }
+
 }

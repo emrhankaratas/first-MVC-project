@@ -13,9 +13,16 @@ public class UrunController : Controller
         _context = context;
     }
 
-    public ActionResult Index()
+    public ActionResult Index(int? kategori)
     {
-        var urunler = _context.Urunler.Select(i => new UrunGetModel
+        var query = _context.Urunler.AsQueryable();
+
+        if(kategori != null)
+        {
+            query = query.Where(i => i.KategoriId == kategori);
+        }
+
+        var urunler = query.Select(i => new UrunGetModel
         {
             Id = i.Id,
             UrunAdi = i.UrunAdi,
@@ -25,6 +32,8 @@ public class UrunController : Controller
             KategoriAdi = i.Kategori.KategoriAdi,
             Resim = i.Resim
         }).ToList();
+
+        ViewBag.Kategoriler = new SelectList(_context.Kategoriler.ToList(), "Id", "KategoriAdi", kategori);
 
         return View(urunler);
     }
@@ -174,5 +183,42 @@ public class UrunController : Controller
 
         ViewBag.Kategoriler = new SelectList(_context.Kategoriler.ToList(), "Id", "KategoriAdi");
         return View(model);
+    }
+
+    public ActionResult Delete(int? id)
+    {
+        if (id == null)
+        {
+            return RedirectToAction("Index");
+        }
+
+        var entity = _context.Urunler.FirstOrDefault(i => i.Id == id);
+
+        if (entity != null)
+        {
+           return View(entity);
+        }
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public ActionResult DeleteConfirm(int? id)
+    {
+        if (id == null)
+        {
+            return RedirectToAction("Index");
+        }
+
+        var entity = _context.Urunler.FirstOrDefault(i => i.Id == id);
+
+        if (entity != null)
+        {
+            _context.Urunler.Remove(entity);
+            _context.SaveChanges();
+
+            TempData["Mesaj"] = $"{entity.UrunAdi} isimli ürün silindi.";
+
+        }
+        return RedirectToAction("Index");
     }
 }
