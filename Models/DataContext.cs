@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace dotnet_store.Models;
 
-public class DataContext : DbContext
+public class DataContext : IdentityDbContext<AppUser, AppRole, int>
 {
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
