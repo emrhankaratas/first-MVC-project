@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddTransient<IEmailService, SmtpEmailService>();
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<DataContext>(options =>
@@ -13,7 +15,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlite(connectionString);
 });
 
-builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<DataContext>();
+builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {

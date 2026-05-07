@@ -13,35 +13,58 @@
                 </a>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped mb-0">
-                        <thead class="table-secondary">
-                            <tr>
-                                <th>Id</th>
-                                <th>Ad Soyad</th>
-                                <th>Email</th>
-                                <th style="width: 50px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var kat in Model)
-                            {
-                                <tr>
-                                    <td>@kat.Id</td>
-                                    <td>@kat.AdSoyad</td>
-                                    <td>@kat.Email</td>
-                                    <td>
-                                        <a asp-controller="User" asp-action="Edit" asp-route-id="@kat.Id"
-                                               class="btn btn-primary btn-sm">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
+                <form method="get">
+                    <div class="input-group mb-2">
+                        <select name="role" class="form-select" asp-items="ViewBag.Roller">
+                            <option value="" selected>Hepsi</option>
+                        </select>
+                        <button class="btn btn-secondary" type="submit">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </form>
 
-                        </tbody>
-                    </table>
-                </div>
+                @if (Model.Count() == 0)
+                {
+                    <p class="text-danger">Kullanıcı Yok</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped mb-0">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Ad Soyad</th>
+                                    <th>Email</th>
+                                    <th style="width: 90px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Id</td>
+                                        <td>@item.AdSoyad</td>
+                                        <td>@item.Email</td>
+                                        <td>
+                                            <a asp-controller="User" asp-action="Edit" asp-route-id="@item.Id"
+                                                   class="btn btn-primary btn-sm">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            <a asp-controller="User" asp-action="Delete" asp-route-id="@item.Id"
+                                                   class="btn btn-danger btn-sm">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
             </div>
         </div>
     </div>

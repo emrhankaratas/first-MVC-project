@@ -1,10 +1,13 @@
 using dotnet_store.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace dotnet_store.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class UserController : Controller
 {
     private UserManager<AppUser> _userManager;
@@ -15,8 +18,15 @@ public class UserController : Controller
         _roleManager = roleManager;
     }
 
-    public ActionResult Index()
+    public async Task<ActionResult> Index(string role)
     {
+        ViewBag.Roller = new SelectList(_roleManager.Roles, "Name", "Name", role);
+        
+        if (!string.IsNullOrEmpty(role))
+        {
+            return View(await _userManager.GetUsersInRoleAsync(role));
+        }
+
         return View(_userManager.Users);
     }
 
@@ -108,5 +118,44 @@ public class UserController : Controller
         }
 
         return View(model);
+    }
+
+    public async Task<ActionResult> Delete(string id)
+    {
+        if (id == null)
+        {
+            return RedirectToAction("Index");
+        }
+
+        var entity = await _userManager.FindByIdAsync(id);
+
+        if (entity != null)
+        {
+           return View(entity);
+        }
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> DeleteConfirm(string id)
+    {
+        if (id == null)
+        {
+            return RedirectToAction("Index");
+        }
+
+        var entity = await _userManager.FindByIdAsync(id);
+
+        if (entity != null)
+        {
+            var result = await _userManager.DeleteAsync(entity);
+
+            if (result.Succeeded)
+            {
+                TempData["Mesaj"] = $"{entity.AdSoyad} isimli kişi silindi.";
+            }
+
+        }
+        return RedirectToAction("Index");
     }
 }

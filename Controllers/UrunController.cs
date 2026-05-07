@@ -1,10 +1,12 @@
 using dotnet_store.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace dotnet_store.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class UrunController : Controller
 {
     private readonly DataContext _context;
@@ -38,6 +40,7 @@ public class UrunController : Controller
         return View(urunler);
     }
 
+    [AllowAnonymous]
     public ActionResult List(string url, string q)
     {
         var query = _context.Urunler.Where(i => i.Aktif);
@@ -57,6 +60,7 @@ public class UrunController : Controller
         return View(query.ToList());
     }
 
+    [AllowAnonymous]
     public ActionResult Details(int id)
     {
         var urun = _context.Urunler.Find(id);
