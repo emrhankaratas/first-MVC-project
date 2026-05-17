@@ -22,9 +22,9 @@
                         <a asp-controller="Account" asp-action="LogOut" class="btn btn-light">
                             <i class="fa fa-heart"></i> <span class="ms-1 d-none d-sm-inline-block">Çıkış Yap</span>
                         </a>
-                        <a href="shopping-cart.html" class="btn btn-light">
+                        @* <a href="shopping-cart.html" class="btn btn-light">
                             <i class="fa fa-shopping-cart"></i> <span class="ms-1 d-none d-sm-inline-block">Sepetim</span>
-                        </a>
+                        </a> *@
                     }
                     else
                     {
@@ -36,6 +36,10 @@
                             <i class="fa-solid fa-user-plus"></i> <span class="ms-1 d-none d-sm-inline-block">Üye Ol</span>
                         </a>
                     }
+
+                    <a asp-controller="Cart" asp-action="Index" class="btn btn-light">
+                            <i class="fa fa-shopping-cart"></i> <span class="ms-1 d-none d-sm-inline-block">Sepetim</span>
+                    </a>
 
 
                 </div>
