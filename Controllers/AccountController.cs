@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using dotnet_store.Models;
+using dotnet_store.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,15 @@ public class AccountController : Controller
     private SignInManager<AppUser> _signInManager;
     private IEmailService _emailService;
     private readonly DataContext _context;
+    private readonly ICartService _cartService;
 
-    public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IEmailService emailService, DataContext context)
+    public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IEmailService emailService, DataContext context, ICartService cartService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _emailService = emailService;
         _context = context;
+        _cartService = cartService;
     }
 
     public ActionResult Create()
@@ -73,7 +76,7 @@ public class AccountController : Controller
                     await _userManager.ResetAccessFailedCountAsync(user);
                     await _userManager.SetLockoutEndDateAsync(user, null);
 
-                    await TransferCartToUser(user);
+                    await _cartService.TransferCartToUser(user.UserName!);
 
                     if (!string.IsNullOrEmpty(returnUrl))
                     {
@@ -88,7 +91,7 @@ public class AccountController : Controller
                 else if (result.IsLockedOut)
                 {
                     var lockoutDate = await _userManager.GetLockoutEndDateAsync(user);
-                    var timeLeft = lockoutDate.Value - DateTime.UtcNow;
+                    var timeLeft = lockoutDate!.Value - DateTime.UtcNow;
                     ModelState.AddModelError("", $"Hesabınız kitlendi. Lütfen {timeLeft.Minutes + 1} dakika sonra tekrar giriş yapınız.");
                 }
                 else
@@ -103,36 +106,6 @@ public class AccountController : Controller
         }
 
         return View(model);
-    }
-
-    private async Task TransferCartToUser(AppUser user)
-    {
-        var userCart = await _context.Carts.Include(i => i.CartItems)
-                                        .ThenInclude(i => i.Urun)
-                                        .Where(i => i.CustomerId == user.UserName)
-                                        .FirstOrDefaultAsync();
-
-        var cookieCart = await _context.Carts.Include(i => i.CartItems)
-                            .ThenInclude(i => i.Urun)
-                            .Where(i => i.CustomerId == Request.Cookies["customerId"])
-                            .FirstOrDefaultAsync();
-
-        foreach (var item in cookieCart?.CartItems!)
-        {
-            var cartItem = userCart?.CartItems.Where(i => i.UrunId == item.UrunId).FirstOrDefault();
-            if (cartItem != null)
-            {
-                cartItem.Miktar += item.Miktar;
-            }
-            else
-            {
-                userCart?.CartItems.Add(new CartItem { UrunId = item.UrunId, Miktar = item.Miktar });
-            }
-        }
-
-        _context.Carts.Remove(cookieCart);
-
-        await _context.SaveChangesAsync();
     }
 
     [Authorize]
