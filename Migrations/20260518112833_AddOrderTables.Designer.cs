@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using dotnet_store.Models;
 
@@ -10,9 +11,11 @@ using dotnet_store.Models;
 namespace dotnet_store.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260518112833_AddOrderTables")]
+    partial class AddOrderTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.11");
@@ -338,10 +341,6 @@ namespace dotnet_store.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("AdSoyad")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("AdresSatiri")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -351,10 +350,6 @@ namespace dotnet_store.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Sehir")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SiparisNotu")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
